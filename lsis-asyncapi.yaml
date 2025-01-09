@@ -1,0 +1,586 @@
+asyncapi: 3.0.0
+info:
+  title: LSIS Messaging API (AMQP)
+  version: 0.0.13
+  description: |
+    This specification covers the AMQP messaging part of the LSIS system.
+  
+    ### Event file size
+    
+    CloudEvents messages can be forwarded to various systems and consumers, including resource-constrained devices. 
+    The event file size is crucial to ensure interoperability among these diverse capabilities. 
+    The maximum size of a CloudEvents-compatible message is 256 KB. This means producers must always keep event payloads 
+    compact and reference data instead of embedding it when the event file size exceeds 256 KB.
+
+    **Explanation**
+
+    This guideline expands upon the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+    by prescribing a maximum event file size of 256 KB. 
+    The [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/) recommends 
+    limiting the maximum size to 64 KB.
+  
+    ### Spec versions
+  
+    **Version 0.0.9**
+    - Initiate version numbering from the final Events-proposal-lsis-v8.jsonc, adhering to semantic versioning principles.
+    - The first version to be implemented by all grid operators will be designated as 1.0.0.
+    - Use generic names for the services in the healthStatus schema.
+    - Required properties and if extra properties are allowed is defined.
+    
+    **version 0.0.10**
+    - Fix typo in keyManagement property
+    
+    **version 0.0.11**
+    - remove `anyOf` construct for schemas since not all frameworks support this.
+    
+    **version 0.0.12**
+    - parametrize the recipient in the stations-presence-changed channel
+    - fix references to the cloudevents components
+    
+    **version 0.0.13**
+    - add descriptions from MFF BAS Event Data Specificatie v0.9 (ter vaststelling).pdf, in English
+    - add dataversion attribute, as per MFF BAS URI Guidelines v2.0 (vastgesteld).pdf
+    - add description about max file size, as per MFF BAS Event Data Specificatie v0.9 (ter vaststelling).pdf
+  contact:
+    name: LSIS Support
+    email: support@landelijksis.net
+servers:
+  lsis-tst:
+    host: 'broker.landelijksis.net:5672'
+    protocol: amqp
+    protocolVersion: 1.0.0
+  lsis-acc:
+    host: 'broker.landelijksis.net:5672'
+    protocol: amqp
+    protocolVersion: 1.0.0
+  lsis-prd:
+    host: 'broker.landelijksis.net:5672'
+    protocol: amqp
+    protocolVersion: 1.0.0
+channels:
+  health-status:
+    title: Health status
+    description: |
+      Monitors the health of LSIS. Only the last status message is retained.
+      Updated every 15 seconds.
+    address: lsis.v1.event.health-status
+    messages:
+      publishHealthStatus.message:
+        contentType: application/cloudevents+json
+        name: Health Status Event
+        payload:
+          $ref: '#/components/schemas/HealthStatus'
+  stations-presence-changed:
+    title: Presence changed
+    description: |
+      Notifications of station occupancy status for a specific recipient.
+      Each message has a retention of 7 days.
+    parameters:
+      recipient:
+        description: The recipient name or identifier.
+        examples:
+          - alliander
+          - enexis
+    address: stations.v1.event.presence.{recipient}
+    messages:
+      publishStationPresenceChanged.message:
+        contentType: application/cloudevents+json
+        name: Presence Changed Event
+        payload:
+          $ref: '#/components/schemas/StationPresenceChanged'
+  stations-presence-acknowledgement:
+    title: Presence acknowledgement
+    description: >
+      Acknowledgement of receipt of a <i>stations.presence.changed</i> event by the
+      operator.
+
+      Must be received within 10 seconds.
+    address: stations.v1.event.acknowledgement
+    messages:
+      publishStationPresenceAcknowledgement.message:
+        contentType: application/cloudevents+json
+        name: Presence Acknowledgement Event
+        payload:
+          $ref: '#/components/schemas/StationPresenceAcknowledgement'
+operations:
+  publishHealthStatus:
+    title: Health status
+    summary: Publish health status event
+    action: receive
+    channel:
+      $ref: '#/channels/health-status'
+    messages:
+      - $ref: >-
+          #/channels/health-status/messages/publishHealthStatus.message
+    bindings:
+      amqp:
+        expiration: 15
+  publishStationPresenceChanged:
+    title: Presence Changed
+    summary: Publish presence changed event
+    action: receive
+    channel:
+      $ref: '#/channels/stations-presence-changed'
+    bindings:
+      amqp:
+        expiration: 604800
+    messages:
+      - $ref: >-
+          #/channels/stations-presence-changed/messages/publishStationPresenceChanged.message
+  publishStationPresenceAcknowledgement:
+    title: Presence acknowledgement
+    summary: Publish presence acknowledgement event
+    action: send
+    channel:
+      $ref: '#/channels/stations-presence-acknowledgement'
+    messages:
+      - $ref: >-
+          #/channels/stations-presence-acknowledgement/messages/publishStationPresenceAcknowledgement.message
+components:
+  schemas:
+    HealthStatusEnum:
+      type: string
+      enum:
+        - healthy
+        - degraded
+        - unhealthy
+    HealthStatus:
+      type: object
+      required: [id, source, specversion, type, data, time, datacontenttype, dataversion]
+      properties:
+        id:
+          description: Identifies the event.
+          "$ref": "#/components/schemas/iddef"
+        source:
+          description: Identifies the context in which an event happened.
+          "$ref": "#/components/schemas/sourcedef"
+        specversion:
+          description: The version of the CloudEvents specification which the event uses.
+          "$ref": "#/components/schemas/specversiondef"
+        type:
+          description: Describes the type of event related to the originating occurrence.
+          "$ref": "#/components/schemas/typedef"
+        datacontenttype:
+          description: |
+            Content type of the data value. Must adhere to RFC 2046 format.
+          "$ref": "#/components/schemas/datacontenttypedef"
+        dataversion:
+          description: |
+            The `dataversion` attribute contains the semantic version of the event data represented by the data attribute.
+          "$ref": "#/components/schemas/dataversiondef"
+        dataschema:
+          description: Identifies the schema that data adheres to.
+          "$ref": "#/components/schemas/dataschemadef"
+        subject:
+          description: Describes the subject of the event in the context of the event producer
+            (identified by source).
+          "$ref": "#/components/schemas/subjectdef"
+        time:
+          description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+          "$ref": "#/components/schemas/timedef"
+        data:
+          type: object
+          required: [keyManagement, surveillance, database, webapp]
+          properties:
+            keyManagement:
+              description:
+                Health status of the key management service
+              $ref: '#/components/schemas/HealthStatusEnum'
+            surveillance:
+              description:
+                  Health status of the surveillance services
+                  When one of the surveillance providers at a station is not working, 
+                  then the status will be unhealthy.
+              $ref: '#/components/schemas/HealthStatusEnum'
+            database:
+              description:
+                  Health status of the database
+              $ref: '#/components/schemas/HealthStatusEnum'
+            webapp:
+              description:
+                  Health status of the web application (LSIS dashboard)
+              $ref: '#/components/schemas/HealthStatusEnum'
+        data_base64:
+          description: Base64 encoded event payload. Must adhere to RFC4648.
+          "$ref": "#/components/schemas/data_base64def"
+      examples:
+      - specversion: '1.0'
+        type: lsis.health-status
+        source: https://landelijksis.net/
+        id: TS1
+        time: '2018-04-05T17:31:00Z'
+        datacontenttype: application/json
+        data:
+          keyManagement: degraded
+          surveillance: unhealthy
+          database: healthy
+          webapp: healthy
+
+    StationPresenceChanged:
+      type: object
+      required: [id, source, specversion, type, data, time, datacontenttype, dataversion]
+      properties:
+        id:
+          description: Identifies the event.
+          "$ref": "#/components/schemas/iddef"
+        source:
+          description: Identifies the context in which an event happened.
+          "$ref": "#/components/schemas/sourcedef"
+        specversion:
+          description: The version of the CloudEvents specification which the event uses.
+          "$ref": "#/components/schemas/specversiondef"
+        type:
+          description: Describes the type of event related to the originating occurrence.
+          "$ref": "#/components/schemas/typedef"
+        datacontenttype:
+          description: Content type of the data value. Must adhere to RFC 2046 format.
+          "$ref": "#/components/schemas/datacontenttypedef"
+        dataversion:
+          description: |
+            The `dataversion` attribute contains the semantic version of the event data represented by the data attribute.
+          "$ref": "#/components/schemas/dataversiondef"
+        dataschema:
+          description: Identifies the schema that data adheres to.
+          "$ref": "#/components/schemas/dataschemadef"
+        subject:
+          description: Describes the subject of the event in the context of the event producer
+            (identified by source).
+          "$ref": "#/components/schemas/subjectdef"
+        time:
+          description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+          "$ref": "#/components/schemas/timedef"
+        data:
+          type: object
+          required: [confirmationId, stationId, occupied, externalIds, change]
+          additionalProperties: false
+          properties:
+            confirmationId:
+              type: string
+              description:
+                Unique identifier of the presence change event to be sent back in the acknowledgement
+            stationId:
+              description:
+                Unique identifier of the station in the LSIS system
+              type: string
+            occupied:
+              description:
+                Whether the station is occupied or not
+              type: boolean
+            externalIds:
+              type: array
+              description:
+                External identifiers of the station as known by the grid operators
+              items:
+                type: object
+                required: [sysop, refId]
+                additionalProperties: false
+                properties:
+                  sysop:
+                    type: string
+                    description:
+                      Tenant identifier of the grid operator
+                  refId:
+                    type: string
+                    description:
+                      Reference identifier of the station at the grid operator
+            change:
+              type: object
+              required: [type, since, userId, fullName, company]
+              additionalProperties: false
+              properties:
+                type:
+                  type: string
+                  description:
+                    Type of change that occurred
+                  enum:
+                    - REGISTERED
+                    - UNREGISTERED
+                    - BECAME_CONTACT_PERSON
+                    - GUEST_TRANSFERRED
+                since:
+                  type: string
+                  description:
+                    Time of the change
+                  format: date-time
+                userId:
+                  type: string
+                  description:
+                    Key management identifier of the user that caused the change
+                fullName:
+                  type: string
+                  description:
+                    Full name of the user that caused the change
+                phoneNumber:
+                  type: string
+                  description:
+                    <p>Phone number of the user that caused the change.</p>                    
+                    <p>Phone numbers are provided by EntraID for key holders, and by Certwell for guests</p>                  
+                    <p><b>Note:</b> This value is required when the user is a key holder.</p>
+                guestOf:
+                  type: string
+                  description:
+                      Key management identifier of the user that this user is the guest of.
+                  
+                      <p><b>Note:</b> This value is only required when the user is a guest.</p>
+                company:
+                  type: string
+                  description:
+                    Company of the user that caused the change
+        data_base64:
+          description: Base64 encoded event payload. Must adhere to RFC4648.
+          "$ref": "#/components/schemas/data_base64def"
+      examples:
+      - specversion: '1.0'
+        type: stations.presence.changed
+        source: https://landelijksis.net/
+        id: A234-1234-1235
+        time: '2018-04-05T17:33:00Z'
+        datacontenttype: application/json
+        data:
+          confirmationId: W4F+HqbAIUeCovb9Jzi7TA==
+          stationId: KX023s1
+          occupied: true
+          externalIds:
+          - sysop: A123-4563-4B13
+            refId: '000000002'
+          change:
+            type: REGISTERED
+            since: '2024-04-04T10:31:00Z'
+            userId: GUID-2733
+            fullName: Conny ter Plaatse
+            phoneNumber: '31677777777'
+            guestOf: GUID-bab3
+            company: Stedin
+    StationPresenceAcknowledgement:
+      type: object
+      required: [id, source, specversion, type, data, time, datacontenttype, dataversion]
+      properties:
+        id:
+          description: Identifies the event.
+          "$ref": "#/components/schemas/iddef"
+        source:
+          description: Identifies the context in which an event happened.
+          "$ref": "#/components/schemas/sourcedef"
+        specversion:
+          description: The version of the CloudEvents specification which the event uses.
+          "$ref": "#/components/schemas/specversiondef"
+        type:
+          description: Describes the type of event related to the originating occurrence.
+          "$ref": "#/components/schemas/typedef"
+        datacontenttype:
+          description: Content type of the data value. Must adhere to RFC 2046 format.
+          "$ref": "#/components/schemas/datacontenttypedef"
+        dataversion:
+          description: |
+            The `dataversion` attribute contains the semantic version of the event data represented by the data attribute.
+          "$ref": "#/components/schemas/dataversiondef"
+        dataschema:
+          description: Identifies the schema that data adheres to.
+          "$ref": "#/components/schemas/dataschemadef"
+        subject:
+          description: Describes the subject of the event in the context of the event producer
+            (identified by source).
+          "$ref": "#/components/schemas/subjectdef"
+        time:
+          description: Timestamp of when the occurrence happened. Must adhere to RFC 3339.
+          "$ref": "#/components/schemas/timedef"
+        data:
+          type: object
+          required: [gridOperatorTenantId, confirmationId]
+          additionalProperties: false
+          properties:
+            gridOperatorTenantId:
+              type: string
+              description:
+                Tenant identifier of the grid operator
+            confirmationId:
+              type: string
+              description:
+                confirmationId of the presence change event that is acknowledged
+        data_base64:
+          description: Base64 encoded event payload. Must adhere to RFC4648.
+          "$ref": "#/components/schemas/data_base64def"
+      examples:
+      - specversion: '1.0'
+        type: stations.presence.acknowledgement
+        source: https://www.tennet.nl/lsis
+        subject: ack
+        id: '78293'
+        time: '2018-04-06T17:33:00Z'
+        datacontenttype: application/json
+        data:
+          gridOperatorTenantId: A123-4563-4B13
+          confirmationId: W4F+HqbAIUeCovb9Jzi7TA==
+    iddef:
+      type: string
+      format: uuid
+      description: |
+        The id attribute contains a unique identifier for the event, preferably in the form of a UUID.
+        
+        **Explanation**
+        
+        CloudEvents provides a mechanism to implement idempotency, requiring that the combination of id and source 
+        uniquely identifies an event. This combination can be used as the idempotency key in downstream implementations. 
+        The combination of id and source must therefore be unique from the producer's perspective. 
+        Consumers can use the combination of id and source to determine whether an event has already been processed.
+        
+        Constraints
+        
+        - Producers must ensure that source + id is unique for each individual event
+      examples:
+        - "f3dce042-cd6e-4977-844d-05be8dce7cea"
+    sourcedef:
+      type: string
+      format: uri-reference
+      description: | 
+        The `source` attribute contains a sequential unique identification of the organization and the source system 
+        that publishes the event. This attribute identifies the source of the event. The combination of organization 
+        and source system must be unique.
+        
+        **Explanation**  
+        This guideline refines the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        by mandating that `source` must always be a composite attribute consisting of the organization and the source system. 
+        In the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/), 
+        this is a recommendation. The logical owner of the source, or the custodian of the data, is part of the payload along with their role.
+        
+        **Constraints**  
+        - Preferred order for `<type identifier>`: EAN, KVK, OIN  
+        - Must follow the schema: `urn:<type identifier>:<organization>:<logical name of source system>`
+      examples:
+        - "urn:ean13: 8716859000003:cmr"
+    specversiondef:
+      type: string
+      pattern: '^\d+\.\d+$'
+      description: |
+        Het attribuut specversion identificeert de versie van de CloudEvents-specificatie die door het event wordt gebruikt. 
+        Dit maakt de interpretatie van de context mogelijk. Conformiteitseisen voor event producers schrijven voor dat 
+        zij een waarde van ‘1.0’ moeten gebruiken wanneer zij naar deze versie van de specificatie verwijzen.
+        
+        De CloudEvents standaard schrijft voor dat in dit attribuut alleen de 'major' en 'minor' versienummers worden opgenomen. 
+        Dit maakt het mogelijk om 'patch'-wijzigingen in de specificatie door te voeren zonder de waarde van deze eigenschap in de serialisatie te veranderen.
+    typedef:
+      type:
+      - string
+      minLength: 1
+      description: |
+        The `type` attribute contains a value that describes the type of event related to the original occurrence. 
+        It provides the intent of the event within the correct context. Context is relevant when defining the type.
+      
+        **Explanation**
+        
+        This guideline deviates from the specification in the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        and mandates that the `type` attribute must always be a composite attribute consisting of a context indicator (domain), 
+        object, and performed action.
+      
+        **Constraints**
+        
+        - Must follow the schema: `<context indicator>.<object>.<performed action>`
+        - The performed action must be written in the past tense, e.g., `created`, `updated`.examples:
+      examples:
+      - value: "mdm.meter.updated"
+        description: |
+          In this example, the `type` indicates that it concerns an update of meter data within the context of 'mdm'.
+          This abbreviation stands for 'meter data management' and identifies a Business Solution within EDSN.
+          This Business Solution can be considered a context and is defined as:
+          'managing meter and measurement data, including actions such as supplementation, validation, and performing calculations.'
+
+    datacontenttypedef:
+      type:
+      - string
+      - 'null'
+      minLength: 1
+      description: |
+        The `datacontenttype` attribute describes how the event data is encoded. Event producers must provide the 
+        `datacontenttype` context attribute to enable event consumers to determine the content type of the event data.
+    
+        **Explanation**
+        
+        This guideline refines the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        by mandating that `datacontenttype` must always be present as a context attribute if event data is present. 
+        In the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/), 
+        this is a recommendation.
+    
+        **Constraints**
+        
+        - Mandatory if a data attribute is present
+        - Must conform to RFC 2046
+      examples:
+        - "application/json"
+    dataversiondef:
+      type:
+      - string
+      pattern: '^\d+\.\d+\.\d+$'
+      minLength: 1
+      description: |
+        The `dataversion` attribute contains the semantic version of the event data represented by the data attribute.
+    
+        **Explanation**
+        
+        This guideline is specific to the energy sector. The [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        does not mandate this attribute. Note that the major versioning is reflected in the URI address of the queue. 
+        See [MFF BAS URI Guidelines](https://mffbas.sharepoint.com/:b:/r/sites/GeneriekeservicesOndersteunendeinformatie/Gedeelde%20documenten/Overig/API%20Richtlijnen/MFF%20BAS%20URI%20Richtlijnen%20v2.0%20(vastgesteld).pdf?csf=1&web=1&e=lEVcLw).
+        
+        **Constraints**
+        
+        - Mandatory if a data attribute is present
+
+      examples:
+        - 1.0.1
+
+    dataschemadef:
+      type:
+      - string
+      - 'null'
+      format: uri
+      minLength: 1
+    subjectdef:
+      type:
+      - string
+      - 'null'
+      minLength: 1
+    timedef:
+      type:
+      - string
+      format: timestamp
+      minLength: 1
+      description: |
+        The `time` attribute contains the timestamp when the source system generated the event.
+    
+        **Explanation**
+        
+        This guideline refines the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        by mandating that `time` must always be present as a context attribute. 
+        In the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/), 
+        this is a recommendation.
+    
+        **Constraints**
+        
+        - Must be in UTC following ISO 8601 format: `yyyy-mm-ddThh:mm:ss.ffffffZ` (e.g., `2024-05-27T13:15:01.450371Z`)
+      examples:
+        - "2023-09-22T14:01:54.957127Z"
+    datadef:
+      type:
+      - object
+      - string
+      - number
+      - array
+      - boolean
+      - 'null'
+      description: |
+        The `data` attribute contains the event payload. This attribute imposes no restrictions on the type of this information. 
+        It is encoded in a media format specified by the `datacontenttype` attribute (e.g., `application/json`).
+    
+        **Explanation**
+        This guideline refines the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/)
+        by mandating that the `data` attribute must always be present if payload data is available. 
+        In the [NL GOV profile for CloudEvents](https://logius-standaarden.github.io/NL-GOV-profile-for-CloudEvents/), 
+        this is a recommendation.
+    
+        **Constraints**
+        - Must contain a non-empty set of attributes
+        - The event payload data model should match the resource model of the REST API where possible
+    data_base64def:
+      type:
+      - string
+      - 'null'
+      contentEncoding: base64
