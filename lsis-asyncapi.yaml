@@ -41,6 +41,9 @@ info:
     - add descriptions from MFF BAS Event Data Specificatie v0.9 (ter vaststelling).pdf, in English
     - add dataversion attribute, as per MFF BAS URI Guidelines v2.0 (vastgesteld).pdf
     - add description about max file size, as per MFF BAS Event Data Specificatie v0.9 (ter vaststelling).pdf
+
+    **version 0.0.14**
+    - Added the overallHealth property to the HealthStatus schema and made it the only required property.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
@@ -180,8 +183,12 @@ components:
           "$ref": "#/components/schemas/timedef"
         data:
           type: object
-          required: [keyManagement, surveillance, database, webapp]
+          required: [overallHealth]
           properties:
+            overallHealth:
+              description:
+                The overall health status of the LSIS system
+              $ref: '#/components/schemas/HealthStatusEnum'
             keyManagement:
               description:
                 Health status of the key management service
