@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: LSIS Messaging API (AMQP)
-  version: 0.0.13
+  version: 0.0.14
   description: |
     This specification covers the AMQP messaging part of the LSIS system.
   
