@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: LSIS Messaging API (AMQP)
-  version: 0.0.14
+  version: 0.0.15
   description: |
     This specification covers the AMQP messaging part of the LSIS system.
   
@@ -44,6 +44,10 @@ info:
 
     **version 0.0.14**
     - Added the overallHealth property to the HealthStatus schema and made it the only required property.
+
+    **version 0.0.15**
+    - Added regions property to the externalIds field of the station presence changed event.
+    - Updated presence queue names changes to topics with subscriptions.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
@@ -84,7 +88,9 @@ channels:
         examples:
           - alliander
           - enexis
-    address: stations.v1.event.presence.{recipient}
+      subscriptionName:
+        description: The name of the subscription for the recipient.
+    address: stations.v1.event.presence.{recipient}/Subscriptions/{subscriptionName}
     messages:
       publishStationPresenceChanged.message:
         contentType: application/cloudevents+json
@@ -279,7 +285,7 @@ components:
                 External identifiers of the station as known by the grid operators
               items:
                 type: object
-                required: [sysop, refId]
+                required: [sysop, refId, regions]
                 additionalProperties: false
                 properties:
                   sysop:
@@ -290,6 +296,12 @@ components:
                     type: string
                     description:
                       Reference identifier of the station at the grid operator
+                  regions:
+                    type: array
+                    description:
+                      A list of regions the station belongs to
+                    items:
+                      type: string
             change:
               type: object
               required: [type, since, userId, fullName, company]
@@ -350,6 +362,7 @@ components:
           externalIds:
           - sysop: A123-4563-4B13
             refId: '000000002'
+            regions: ['zuid']
           change:
             type: REGISTERED
             since: '2024-04-04T10:31:00Z'
