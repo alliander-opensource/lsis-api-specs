@@ -14,4 +14,4 @@ jobs:
         run: npm install --global prettier
 
       - name: Check YAML formatting
-        run: prettier --check "**/*.yml"
+        run: prettier --check "**/*.yaml"
