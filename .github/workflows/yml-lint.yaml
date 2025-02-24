@@ -1,32 +1,17 @@
-name: YAML Formatting
+name: YAML Lint
 
-on: [pull_request]
+on:
+  pull_request:
 
 jobs:
-  format:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}  # Checkout the pull request branch
-          fetch-depth: 0  # Ensure full branch history is available
-
-      - name: Set up Git identity
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
 
       - name: Install Prettier
         run: npm install --global prettier
 
-      - name: Format YAML files
-        run: prettier --write "**/*.yaml"
-
-      - name: Commit changes
-        run: |
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "chore: auto-format YAML files" -s
-
-      - name: Push changes back to the PR branch
-        run: git push
+      - name: Check YAML formatting
+        run: prettier --check "**/*.yml"
