@@ -1,3 +1,9 @@
+# ------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 'Copyright Contributors to the LSIS project'
+#
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
 asyncapi: 3.0.0
 info:
   title: LSIS Messaging API (AMQP)
