@@ -13,7 +13,7 @@ jobs:
         run: npm install --global prettier
 
       - name: Format YAML files
-        run: prettier --write "**/*.yml"
+        run: prettier --write "**/*.yaml"
 
       - name: Commit changes
         run: |
