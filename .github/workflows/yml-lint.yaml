@@ -1,0 +1,17 @@
+name: YAML Lint
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Prettier
+        run: npm install --global prettier
+
+      - name: Check YAML formatting
+        run: prettier --check "**/*.yaml"

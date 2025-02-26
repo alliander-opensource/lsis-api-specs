@@ -1,21 +1,27 @@
+# ------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: 'Copyright Contributors to the LSIS project'
+#
+# SPDX-License-Identifier: Apache-2.0
+# ------------------------------------------------------------------------------
+
 openapi: 3.0.3
 info:
   title: LSIS API (REST)
   version: 0.0.11
   description: |
     This API enables on-demand querying of station occupancy through RESTful services.
-  
+
     **Version 0.0.9**
     - Initiate version numbering from the final Events-proposal-lsis-v8.jsonc, adhering to semantic versioning principles.
     - The first version to be implemented by all grid operators will be designated as 1.0.0.
     - Add descriptions from Events-proposal-lsis-v8.jsonc to API endpoints.
     - Add which properties are required and which objects allow additional properties.
     - Add missing attendees object definition.
-    
+
     **Version 0.0.10**
     - Introduced cursor-based pagination to the /api/stations/v1/occupancy endpoint to efficiently handle large datasets, 
       allowing clients to use cursor and limit parameters to navigate through paginated results.
-    
+
     **Version 0.0.11**
     - Add bad request to path responses.
     - Add descriptions to responses in order to better clarify their purpose.
@@ -49,27 +55,27 @@ paths:
         If set, the value indicates an attending keyholder to which the guest is bound.
       operationId: retrieveElectricityStationOccupancy
       parameters:
-      - "$ref": "#/components/parameters/StationIdParam"
-      - "$ref": "#/components/parameters/AuthHeaderParam"
+        - "$ref": "#/components/parameters/StationIdParam"
+        - "$ref": "#/components/parameters/AuthHeaderParam"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ElectricityStationOccupancyResponse'
-        '400':
+                $ref: "#/components/schemas/ElectricityStationOccupancyResponse"
+        "400":
           $ref: "#/components/responses/BadRequest"
-        '401':
+        "401":
           $ref: "#/components/responses/Unauthorized"
-        '403':
+        "403":
           $ref: "#/components/responses/Forbidden"
-        '404':
+        "404":
           $ref: "#/components/responses/NotFound"
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
   /occupancy:
     get:
@@ -89,22 +95,22 @@ paths:
         - "$ref": "#/components/parameters/LimitParam"
         - "$ref": "#/components/parameters/AuthHeaderParam"
       responses:
-        '200':
+        "200":
           description: Occupancy details for the requested stations
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ElectricityStationsOccupancyResponse'
-        '400':
+                $ref: "#/components/schemas/ElectricityStationsOccupancyResponse"
+        "400":
           $ref: "#/components/responses/BadRequest"
-        '401':
+        "401":
           $ref: "#/components/responses/Unauthorized"
-        '403':
+        "403":
           $ref: "#/components/responses/Forbidden"
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-        '503':
-          $ref: '#/components/responses/ServiceUnavailable'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
 components:
   securitySchemes:
@@ -123,7 +129,7 @@ components:
       type: string
     BadRequest:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -133,12 +139,12 @@ components:
         title:
           type: string
           enum:
-          - Bad Request
+            - Bad Request
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1
+            - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1
         detail:
           type: string
         instance:
@@ -146,7 +152,7 @@ components:
           format: uri
     Unauthorized:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -156,12 +162,12 @@ components:
         title:
           type: string
           enum:
-          - Unauthorized
+            - Unauthorized
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7235#section-3.1
+            - https://datatracker.ietf.org/doc/html/rfc7235#section-3.1
         detail:
           type: string
         instance:
@@ -169,7 +175,7 @@ components:
           format: uri
     Forbidden:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -179,12 +185,12 @@ components:
         title:
           type: string
           enum:
-          - Forbidden
+            - Forbidden
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3
+            - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3
         detail:
           type: string
         instance:
@@ -192,7 +198,7 @@ components:
           format: uri
     NotFound:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -202,12 +208,12 @@ components:
         title:
           type: string
           enum:
-          - Not Found
+            - Not Found
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4
+            - https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4
         detail:
           type: string
         instance:
@@ -215,7 +221,7 @@ components:
           format: uri
     InternalServerError:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -225,12 +231,12 @@ components:
         title:
           type: string
           enum:
-          - Internal Server Error
+            - Internal Server Error
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1
+            - https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1
         detail:
           type: string
         instance:
@@ -238,7 +244,7 @@ components:
           format: uri
     ServiceUnavailable:
       type: object
-      required: [ status, title, type ]
+      required: [status, title, type]
       properties:
         status:
           type: number
@@ -248,12 +254,12 @@ components:
         title:
           type: string
           enum:
-          - Service Unavailable
+            - Service Unavailable
         type:
           type: string
           format: uri
           enum:
-          - https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.4
+            - https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.4
         detail:
           type: string
         instance:
@@ -281,87 +287,80 @@ components:
                 properties:
                   sysop:
                     type: string
-                    description:
-                      Tenant identifier of the grid operator
+                    description: Tenant identifier of the grid operator
                   refId:
                     type: string
-                    description:
-                      Reference identifier of the station at the grid operator
+                    description: Reference identifier of the station at the grid operator
             attendees:
               type: array
               items:
                 type: object
-                required: [userId, fullName, isContactPerson, attendingSince, company]
+                required:
+                  [userId, fullName, isContactPerson, attendingSince, company]
                 additionalProperties: false
                 properties:
                   userId:
                     type: string
                     format: uuid
-                    description:
-                      Key management identifier of the attendee
+                    description: Key management identifier of the attendee
                   fullName:
                     type: string
-                    description:
-                      Full name of the attendee
+                    description: Full name of the attendee
                   phoneNumber:
                     type: string
-                    description:
-                      <p>Phone number of the attendee.</p>
+                    description: <p>Phone number of the attendee.</p>
                       <p>Phone numbers are provided by EntraID for key holders, and by Certwell for guests</p>
                       <p><b>Note:</b> This value is required when the attendee is a contact person or key holder.</p>
                   isContactPerson:
                     type: boolean
-                    description:
-                      Indicates whether the attendee is the contact person at the station.
+                    description: Indicates whether the attendee is the contact person at the station.
                   guestOf:
                     type: string
                     format: uuid
                     description:
-                        Key management identifier of the attendee this attendee is the guest of.
-                    
-                        <p><b>Note:</b> This value is only required when the attendee is a guest.</p>
+                      Key management identifier of the attendee this attendee is the guest of.
+
+                      <p><b>Note:</b> This value is only required when the attendee is a guest.</p>
                   registeredBy:
                     type: string
                     format: uuid
                     description:
                       Key management identifier of the person that registered the attendee.
-                    
+
                       <p><b>Note:</b> This value is only required when the attendee is registered by someone else.</p>
                   attendingSince:
                     type: string
                     format: date-time
-                    description:
-                      Date and time the attendee arrived at the station.
+                    description: Date and time the attendee arrived at the station.
                   company:
                     type: string
-                    description:
-                      Company of the attendee
+                    description: Company of the attendee
       example:
         data:
           id: KX023s1
           occupied: true
-          occupiedSince: '2024-04-04T10:31:00Z'
+          occupiedSince: "2024-04-04T10:31:00Z"
           externalIds:
             - sysop: A123-4563-4B13
-              refId: '000000002'
+              refId: "000000002"
           attendees:
             - userId: GUID-2733
               fullName: Conny ter Plaatse
-              phoneNumber: '31677777777'
+              phoneNumber: "31677777777"
               isContactPerson: true
               guestOf: GUID-bab3
               registeredBy: GUID-caf3
-              attendingSince: '2024-04-04T10:31:00Z'
+              attendingSince: "2024-04-04T10:31:00Z"
               company: Stedin
 
     ElectricityStationsOccupancyResponse:
       type: object
-      required: [ data, responseMetadata ]
+      required: [data, responseMetadata]
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/ElectricityStationOccupancyResponse'
+            $ref: "#/components/schemas/ElectricityStationOccupancyResponse"
         responseMetadata:
           type: object
           properties:
@@ -375,18 +374,18 @@ components:
         data:
           - id: KX023s1
             occupied: true
-            occupiedSince: '2024-04-04T10:31:00Z'
+            occupiedSince: "2024-04-04T10:31:00Z"
             externalIds:
               - sysop: A123-4563-4B13
-                refId: '000000002'
+                refId: "000000002"
             attendees:
               - userId: GUID-2733
                 fullName: Conny ter Plaatse
-                phoneNumber: '31677777777'
+                phoneNumber: "31677777777"
                 isContactPerson: true
                 guestOf: GUID-bab3
                 registeredBy: GUID-caf3
-                attendingSince: '2024-04-04T10:31:00Z'
+                attendingSince: "2024-04-04T10:31:00Z"
                 company: Stedin
         responseMetadata:
           nextCursor: "dXNlcjpVMEc5V0ZYTlo="
