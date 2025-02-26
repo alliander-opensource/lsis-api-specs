@@ -312,12 +312,10 @@ components:
                     description: Tenant identifier of the grid operator
                   refId:
                     type: string
-                    description:
-                      Reference identifier of the station at the grid operator
+                    description: Reference identifier of the station at the grid operator
                   regions:
                     type: array
-                    description:
-                      A list of regions the station belongs to
+                    description: A list of regions the station belongs to
                     items:
                       type: string
             change:
@@ -362,28 +360,28 @@ components:
           description: Base64 encoded event payload. Must adhere to RFC4648.
           "$ref": "#/components/schemas/data_base64def"
       examples:
-      - specversion: '1.0'
-        type: stations.presence.changed
-        source: https://landelijksis.net/
-        id: A234-1234-1235
-        time: '2018-04-05T17:33:00Z'
-        datacontenttype: application/json
-        data:
-          confirmationId: W4F+HqbAIUeCovb9Jzi7TA==
-          stationId: KX023s1
-          occupied: true
-          externalIds:
-          - sysop: A123-4563-4B13
-            refId: '000000002'
-            regions: ['zuid']
-          change:
-            type: REGISTERED
-            since: '2024-04-04T10:31:00Z'
-            userId: GUID-2733
-            fullName: Conny ter Plaatse
-            phoneNumber: '31677777777'
-            guestOf: GUID-bab3
-            company: Stedin
+        - specversion: "1.0"
+          type: stations.presence.changed
+          source: https://landelijksis.net/
+          id: A234-1234-1235
+          time: "2018-04-05T17:33:00Z"
+          datacontenttype: application/json
+          data:
+            confirmationId: W4F+HqbAIUeCovb9Jzi7TA==
+            stationId: KX023s1
+            occupied: true
+            externalIds:
+              - sysop: A123-4563-4B13
+                refId: "000000002"
+                regions: ["zuid"]
+            change:
+              type: REGISTERED
+              since: "2024-04-04T10:31:00Z"
+              userId: GUID-2733
+              fullName: Conny ter Plaatse
+              phoneNumber: "31677777777"
+              guestOf: GUID-bab3
+              company: Stedin
     StationPresenceAcknowledgement:
       type: object
       required:
