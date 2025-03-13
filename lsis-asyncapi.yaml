@@ -11,6 +11,8 @@ info:
   description: |
     This specification covers the AMQP messaging part of the LSIS system.
 
+    > NOTE: LSIS uses Azure Service Bus for messaging, which also supports the HTTPS protocol.
+
     ### Event file size
 
     CloudEvents messages can be forwarded to various systems and consumers, including resource-constrained devices. 
@@ -58,16 +60,12 @@ info:
     name: LSIS Support
     email: support@landelijksis.net
 servers:
-  lsis-tst:
-    host: "broker.landelijksis.net:5672"
-    protocol: amqp
-    protocolVersion: 1.0.0
   lsis-acc:
-    host: "broker.landelijksis.net:5672"
+    host: "ext-events.landelijksis.net:5672"
     protocol: amqp
     protocolVersion: 1.0.0
   lsis-prd:
-    host: "broker.landelijksis.net:5672"
+    host: "events.landelijksis.net:5672"
     protocol: amqp
     protocolVersion: 1.0.0
 channels:
