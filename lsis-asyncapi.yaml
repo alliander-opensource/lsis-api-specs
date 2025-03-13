@@ -167,10 +167,7 @@ components:
           source,
           specversion,
           type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
+          data
         ]
       properties:
         id:
@@ -249,10 +246,7 @@ components:
           source,
           specversion,
           type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
+          data
         ]
       properties:
         id:
@@ -390,10 +384,7 @@ components:
           source,
           specversion,
           type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
+          data
         ]
       properties:
         id:
