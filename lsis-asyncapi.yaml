@@ -159,14 +159,7 @@ components:
         - unhealthy
     HealthStatus:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
@@ -238,14 +231,7 @@ components:
 
     StationPresenceChanged:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
@@ -376,14 +362,7 @@ components:
               company: Stedin
     StationPresenceAcknowledgement:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
