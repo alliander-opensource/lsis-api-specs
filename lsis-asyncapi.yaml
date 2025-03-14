@@ -7,9 +7,11 @@
 asyncapi: 3.0.0
 info:
   title: LSIS Messaging API (AMQP)
-  version: 0.0.14
+  version: 0.0.15
   description: |
     This specification covers the AMQP messaging part of the LSIS system.
+
+    > NOTE: LSIS uses Azure Service Bus for messaging, which also supports the HTTPS protocol.
 
     ### Event file size
 
@@ -50,20 +52,20 @@ info:
 
     **version 0.0.14**
     - Added the overallHealth property to the HealthStatus schema and made it the only required property.
+
+    **version 0.0.15**
+    - Added regions property to the externalIds field of the station presence changed event.
+    - Updated presence queue names changes to topics with subscriptions.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
 servers:
-  lsis-tst:
-    host: "broker.landelijksis.net:5672"
-    protocol: amqp
-    protocolVersion: 1.0.0
   lsis-acc:
-    host: "broker.landelijksis.net:5672"
+    host: "ext-events.landelijksis.net:5672"
     protocol: amqp
     protocolVersion: 1.0.0
   lsis-prd:
-    host: "broker.landelijksis.net:5672"
+    host: "events.landelijksis.net:5672"
     protocol: amqp
     protocolVersion: 1.0.0
 channels:
@@ -90,7 +92,9 @@ channels:
         examples:
           - alliander
           - enexis
-    address: stations.v1.event.presence.{recipient}
+      subscriptionName:
+        description: The name of the subscription for the recipient.
+    address: stations.v1.event.presence.{recipient}/Subscriptions/{subscriptionName}
     messages:
       publishStationPresenceChanged.message:
         contentType: application/cloudevents+json
@@ -155,17 +159,7 @@ components:
         - unhealthy
     HealthStatus:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
@@ -237,17 +231,7 @@ components:
 
     StationPresenceChanged:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
@@ -298,7 +282,7 @@ components:
               description: External identifiers of the station as known by the grid operators
               items:
                 type: object
-                required: [sysop, refId]
+                required: [sysop, refId, regions]
                 additionalProperties: false
                 properties:
                   sysop:
@@ -307,6 +291,11 @@ components:
                   refId:
                     type: string
                     description: Reference identifier of the station at the grid operator
+                  regions:
+                    type: array
+                    description: A list of regions the station belongs to
+                    items:
+                      type: string
             change:
               type: object
               required: [type, since, userId, fullName, company]
@@ -362,6 +351,7 @@ components:
             externalIds:
               - sysop: A123-4563-4B13
                 refId: "000000002"
+                regions: ["zuid"]
             change:
               type: REGISTERED
               since: "2024-04-04T10:31:00Z"
@@ -372,17 +362,7 @@ components:
               company: Stedin
     StationPresenceAcknowledgement:
       type: object
-      required:
-        [
-          id,
-          source,
-          specversion,
-          type,
-          data,
-          time,
-          datacontenttype,
-          dataversion,
-        ]
+      required: [id, source, specversion, type, data]
       properties:
         id:
           description: Identifies the event.
