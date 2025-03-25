@@ -7,7 +7,7 @@
 openapi: 3.0.3
 info:
   title: LSIS API (REST)
-  version: 0.0.11
+  version: 0.0.12
   description: |
     This API enables on-demand querying of station occupancy through RESTful services.
 
@@ -30,6 +30,11 @@ info:
     - types of error response properties are made more explicit.
     - Change urls to be compliant with NBility model.
     - Change securitySchemes to oAuth2. (The tokenUrl and refreshUrl are unknown at this moment).
+
+    **Version 0.0.12**
+    - Add missing `occupiedSince` property to `ElectricityStationOccupancyResponse`
+    - The `attendees` array should now be populated when the station is occupied and when retrieving 
+      the occupancies of all stations via the `/occupancy` endpoint.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
@@ -81,8 +86,7 @@ paths:
     get:
       summary: Retrieve occupancy of all electricity stations
       description: |
-        REST/JSON API-endpoint for global attendance on all caller visible stations. 
-        Note that attendees are only available for individual stations.
+        REST/JSON API-endpoint for global attendance on all caller visible stations.
       operationId: getAllStationsOccupancy
       parameters:
         - name: occupied
@@ -279,6 +283,11 @@ components:
             occupied:
               type: boolean
               description: Whether the station is occupied
+            occupiedSince:
+              type: string
+              format: date-time
+              description: Date and time the station became occupied.
+                <p><b>Note:</b> This value is only required when the `occupied` is true.</p>
             externalIds:
               type: array
               items:
