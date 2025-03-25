@@ -33,8 +33,6 @@ info:
 
     **Version 0.0.12**
     - Add missing `occupiedSince` property to `ElectricityStationOccupancyResponse`
-    - Remove `attendees` from `ElectricityStationsOccupancyResponse` schema instead of mentioning it in the 
-      `occupancy` endpoint description.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
@@ -86,7 +84,8 @@ paths:
     get:
       summary: Retrieve occupancy of all electricity stations
       description: |
-        REST/JSON API-endpoint for global attendance on all caller visible stations.
+        REST/JSON API-endpoint for global attendance on all caller visible stations. 
+        Note that attendees are only available for individual stations.
       operationId: getAllStationsOccupancy
       parameters:
         - name: occupied
@@ -369,33 +368,7 @@ components:
         data:
           type: array
           items:
-            type: object
-            required: [id, occupied, externalIds]
-            additionalProperties: false
-            properties:
-              id:
-                type: string
-                description: Station ID
-              occupied:
-                type: boolean
-                description: Whether the station is occupied
-              occupiedSince:
-                type: string
-                format: date-time
-                description: Date and time the station became occupied.
-                  <p><b>Note:</b> This value is only required when the `occupied` is true.</p>
-              externalIds:
-                type: array
-                items:
-                  type: object
-                  required: [sysop, refId]
-                  properties:
-                    sysop:
-                      type: string
-                      description: Tenant identifier of the grid operator
-                    refId:
-                      type: string
-                      description: Reference identifier of the station at the grid operator
+            $ref: "#/components/schemas/ElectricityStationOccupancyResponse"
         responseMetadata:
           type: object
           properties:
@@ -413,6 +386,15 @@ components:
             externalIds:
               - sysop: A123-4563-4B13
                 refId: "000000002"
+            attendees:
+              - userId: GUID-2733
+                fullName: Conny ter Plaatse
+                phoneNumber: "31677777777"
+                isContactPerson: true
+                guestOf: GUID-bab3
+                registeredBy: GUID-caf3
+                attendingSince: "2024-04-04T10:31:00Z"
+                company: Stedin
         responseMetadata:
           nextCursor: "dXNlcjpVMEc5V0ZYTlo="
 
