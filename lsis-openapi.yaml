@@ -33,6 +33,8 @@ info:
 
     **Version 0.0.12**
     - Add missing `occupiedSince` property to `ElectricityStationOccupancyResponse`
+    - The `attendees` array should now be populated when the station is occupied and when retrieving 
+      the occupancies of all stations via the `/occupancy` endpoint.
   contact:
     name: LSIS Support
     email: support@landelijksis.net
@@ -84,8 +86,7 @@ paths:
     get:
       summary: Retrieve occupancy of all electricity stations
       description: |
-        REST/JSON API-endpoint for global attendance on all caller visible stations. 
-        Note that attendees are only available for individual stations.
+        REST/JSON API-endpoint for global attendance on all caller visible stations.
       operationId: getAllStationsOccupancy
       parameters:
         - name: occupied
