@@ -18,7 +18,7 @@ This project is licensed under the Apache-2.0 - see [LICENSE](https://github.com
 
 ## Contributing
 
-Please read CODE_OF_CONDUCT.md, CONTRIBUTING.md, and PROJECT GOVERNANCE.md for details on the process for submitting pull requests to us.
+Please read [CODE_OF_CONDUCT.md](https://github.com/alliander-opensource/lsis-api-specs/blob/main/CODE_OF_CONDUCT.md), [CONTRIBUTING.md](https://github.com/alliander-opensource/lsis-api-specs/blob/main/CONTRIBUTING.md), and [PROJECT GOVERNANCE.md](https://github.com/alliander-opensource/lsis-api-specs/blob/main/PROJECT_GOVERNANCE.md) for details on the process for submitting pull requests to us.
 
 ## Contact
 Please read [SUPPORT.md](SUPPORT.md) for how to connect and get into contact with the LSIS project. 
